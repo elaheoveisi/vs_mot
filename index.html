@@ -418,10 +418,10 @@
           <input type="number" id="cfgVsTrials" min="1" max="30" value="10">
         </div>
         <div class="fieldrow">
-          <label for="cfgVsIsi">Seconds between trials
-            <span class="hint">fixed gap after each response</span>
+          <label for="cfgVsIsi">Response limit per trial
+            <span class="hint">fixed at 5 seconds</span>
           </label>
-          <input type="number" id="cfgVsIsi" min="1" max="15" value="5">
+          <input type="number" id="cfgVsIsi" min="5" max="5" value="5" disabled>
         </div>
         <div class="settingsnote" id="vsTrialPreview"></div>
       </div>
@@ -538,6 +538,10 @@
 /* ---------- utility ---------- */
 const $ = id => document.getElementById(id);
 function showScreen(id){
+  if(id !== 'vs' && $('vs').classList.contains('active')){
+    clearVSTimers();
+    vsAwaiting = false;
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   if(id==='results') renderHistory();
@@ -580,8 +584,11 @@ function requireNameThen(fn){
 }
 
 /* ---------- config (localStorage — this device only) ---------- */
+const VS_RESPONSE_LIMIT_SEC = 5;
+const VS_RESPONSE_LIMIT_MS = VS_RESPONSE_LIMIT_SEC * 1000;
+const VS_FEEDBACK_MS = 450;
 const DEFAULT_CONFIG = {
-  vs: { rows:4, cols:4, trials:10, isiSec:5 },
+  vs: { rows:4, cols:4, trials:10 },
   mot: { trials:5, numObjects:8, numTargets:3, durationSec:6 }
 };
 let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
@@ -602,7 +609,7 @@ function populateSettingsForm(){
   $('cfgVsRows').value = config.vs.rows;
   $('cfgVsCols').value = config.vs.cols;
   $('cfgVsTrials').value = config.vs.trials;
-  $('cfgVsIsi').value = config.vs.isiSec;
+  $('cfgVsIsi').value = VS_RESPONSE_LIMIT_SEC;
   $('cfgMotTrials').value = config.mot.trials;
   $('cfgMotObjects').value = config.mot.numObjects;
   $('cfgMotTargets').value = config.mot.numTargets;
@@ -620,12 +627,11 @@ function updateVsPreview(){
   const rows = parseInt($('cfgVsRows').value) || 0;
   const cols = parseInt($('cfgVsCols').value) || 0;
   const trials = parseInt($('cfgVsTrials').value) || 0;
-  const isi = parseInt($('cfgVsIsi').value) || 0;
   $('vsTrialPreview').textContent = (rows>=2 && cols>=2)
-    ? `→ ${rows*cols} glyphs per trial, ${trials} trials, ${isi}s between each`
+    ? `→ ${rows*cols} glyphs per trial, ${trials} trials, ${VS_RESPONSE_LIMIT_SEC}s response limit`
     : 'Enter valid row and column counts.';
 }
-['cfgVsRows','cfgVsCols','cfgVsTrials','cfgVsIsi'].forEach(id=>{
+['cfgVsRows','cfgVsCols','cfgVsTrials'].forEach(id=>{
   $(id).addEventListener('input', updateVsPreview);
 });
 
@@ -640,7 +646,6 @@ function saveSettings(){
   const rows = parseInt($('cfgVsRows').value);
   const cols = parseInt($('cfgVsCols').value);
   const vsTrials = parseInt($('cfgVsTrials').value);
-  const isiSec = parseInt($('cfgVsIsi').value);
   const motTrials = parseInt($('cfgMotTrials').value);
   const numObjects = parseInt($('cfgMotObjects').value);
   const numTargets = parseInt($('cfgMotTargets').value);
@@ -650,7 +655,6 @@ function saveSettings(){
   if(!rows || rows < 2 || rows > 6) errors.push('Grid rows must be between 2 and 6.');
   if(!cols || cols < 2 || cols > 6) errors.push('Grid columns must be between 2 and 6.');
   if(!vsTrials || vsTrials < 1 || vsTrials > 30) errors.push('Visual search trials must be between 1 and 30.');
-  if(!isiSec || isiSec < 1 || isiSec > 15) errors.push('Seconds between trials must be between 1 and 15.');
   if(!motTrials || motTrials < 1 || motTrials > 15) errors.push('MOT trials must be between 1 and 15.');
   if(!numObjects || numObjects < 3 || numObjects > 20) errors.push('Object count must be between 3 and 20.');
   if(!numTargets || numTargets < 1 || numTargets >= numObjects) errors.push('Target count must be less than object count.');
@@ -662,7 +666,7 @@ function saveSettings(){
   }
 
   config = {
-    vs: { rows, cols, trials: vsTrials, isiSec },
+    vs: { rows, cols, trials: vsTrials },
     mot: { trials: motTrials, numObjects, numTargets, durationSec }
   };
   persistConfig();
@@ -774,9 +778,21 @@ const vsCanvas = $('vsCanvas');
 const vsCtx = vsCanvas.getContext('2d');
 const VS_BG = '#DCDBD6', VS_GLYPH = '#1B1D1F', VS_TARGET_HILITE = '#FE5C00';
 let vsIndex = 0, vsResultsArr = [], vsOnset = 0, vsAwaiting = false;
-let vsCells = [], vsTargetIdx = -1, vsIsiTimer = null;
+let vsCells = [], vsTargetIdx = -1;
+let vsResponseTimer = null, vsCountdownTimer = null, vsAdvanceTimer = null;
+
+function clearVSTimers(){
+  clearTimeout(vsResponseTimer);
+  clearInterval(vsCountdownTimer);
+  clearTimeout(vsAdvanceTimer);
+  vsResponseTimer = null;
+  vsCountdownTimer = null;
+  vsAdvanceTimer = null;
+}
 
 function startVS(){
+  clearVSTimers();
+  vsAwaiting = false;
   vsIndex = 0;
   vsResultsArr = [];
   showScreen('vs');
@@ -813,12 +829,13 @@ function drawGlyph(ctx, cx, cy, size, isTarget, rotationDeg, color){
 }
 
 function nextVSTrial(){
+  clearVSTimers();
   if(vsIndex >= config.vs.trials){ finishVS(); return; }
   const rows = config.vs.rows, cols = config.vs.cols;
   const n = rows * cols;
   $('vsTrialNum').textContent = `${vsIndex+1}/${config.vs.trials}`;
   $('vsSetSize').textContent = n;
-  $('vsNote').textContent = 'Click the one straight, upright T — the rest are rotated.';
+  $('vsNote').textContent = `Click the upright T — ${VS_RESPONSE_LIMIT_SEC}s remaining.`;
 
   const w = vsCanvas.width, h = vsCanvas.height;
   const padX = w*0.08, padY = h*0.10;
@@ -844,6 +861,17 @@ function nextVSTrial(){
 
   vsAwaiting = true;
   vsOnset = performance.now();
+  let lastShown = VS_RESPONSE_LIMIT_SEC;
+  vsCountdownTimer = setInterval(()=>{
+    if(!vsAwaiting) return;
+    const elapsed = performance.now() - vsOnset;
+    const remaining = Math.max(1, Math.ceil((VS_RESPONSE_LIMIT_MS - elapsed) / 1000));
+    if(remaining !== lastShown){
+      lastShown = remaining;
+      $('vsNote').textContent = `Click the upright T — ${remaining}s remaining.`;
+    }
+  }, 200);
+  vsResponseTimer = setTimeout(vsTimeout, VS_RESPONSE_LIMIT_MS);
 }
 
 vsCanvas.addEventListener('click', (e)=>{
@@ -861,32 +889,35 @@ vsCanvas.addEventListener('click', (e)=>{
 
 function vsRespondCell(idx){
   if(!vsAwaiting) return;
+  const rt = Math.min(Math.round(performance.now() - vsOnset), VS_RESPONSE_LIMIT_MS);
+  completeVSTrial(idx === vsTargetIdx, rt, false);
+}
+
+function vsTimeout(){
+  if(!vsAwaiting) return;
+  completeVSTrial(false, VS_RESPONSE_LIMIT_MS, true);
+}
+
+function completeVSTrial(correct, rt, timedOut){
+  if(!vsAwaiting) return;
   vsAwaiting = false;
-  const rt = Math.round(performance.now() - vsOnset);
-  const correct = idx === vsTargetIdx;
+  clearVSTimers();
   flash(correct ? 'correct' : 'incorrect');
-  vsResultsArr.push({trial: vsIndex+1, correct, rt});
+  vsResultsArr.push({trial: vsIndex+1, correct, rt, timedOut});
   const c = vsResultsArr.filter(r=>r.correct).length;
   $('vsRunningScore').textContent = `${c}/${vsResultsArr.length}`;
   vsIndex++;
-
-  let remaining = config.vs.isiSec;
-  $('vsNote').textContent = correct
-    ? `Correct — next glyph field in ${remaining}s…`
-    : `Not quite — next glyph field in ${remaining}s…`;
-  clearInterval(vsIsiTimer);
-  vsIsiTimer = setInterval(()=>{
-    remaining--;
-    if(remaining > 0){
-      $('vsNote').textContent = (correct ? 'Correct' : 'Not quite') + ` — next glyph field in ${remaining}s…`;
-    } else {
-      clearInterval(vsIsiTimer);
-      nextVSTrial();
-    }
-  }, 1000);
+  $('vsNote').textContent = timedOut
+    ? 'Time expired — moving to the next trial…'
+    : correct
+      ? 'Correct — moving to the next trial…'
+      : 'Not quite — moving to the next trial…';
+  vsAdvanceTimer = setTimeout(nextVSTrial, VS_FEEDBACK_MS);
 }
 
 async function finishVS(){
+  clearVSTimers();
+  vsAwaiting = false;
   const total = vsResultsArr.length;
   const correct = vsResultsArr.filter(r=>r.correct).length;
   const accuracy = Math.round((correct/total)*100);
@@ -897,7 +928,7 @@ async function finishVS(){
   $('vsRT').textContent = meanRT+'ms';
   const tbody = document.querySelector('#vsBreakdown tbody');
   tbody.innerHTML = vsResultsArr.map(r=>
-    `<tr><td>${r.trial}</td><td class="${r.correct?'hit':'miss'}">${r.correct?'Correct':'Incorrect'}</td><td>${r.rt}ms</td></tr>`
+    `<tr><td>${r.trial}</td><td class="${r.correct?'hit':'miss'}">${r.timedOut?'Timeout':r.correct?'Correct':'Incorrect'}</td><td>${r.rt}ms</td></tr>`
   ).join('');
 
   await saveSession({
