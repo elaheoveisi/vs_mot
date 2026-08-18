@@ -586,7 +586,6 @@ function requireNameThen(fn){
 /* ---------- config (localStorage — this device only) ---------- */
 const VS_RESPONSE_LIMIT_SEC = 5;
 const VS_RESPONSE_LIMIT_MS = VS_RESPONSE_LIMIT_SEC * 1000;
-const VS_FEEDBACK_MS = 450;
 const DEFAULT_CONFIG = {
   vs: { rows:4, cols:4, trials:10 },
   mot: { trials:5, numObjects:8, numTargets:3, durationSec:6 }
@@ -901,6 +900,7 @@ function vsTimeout(){
 function completeVSTrial(correct, rt, timedOut){
   if(!vsAwaiting) return;
   vsAwaiting = false;
+  const remainingMs = timedOut ? 0 : Math.max(0, VS_RESPONSE_LIMIT_MS - rt);
   clearVSTimers();
   flash(correct ? 'correct' : 'incorrect');
   vsResultsArr.push({trial: vsIndex+1, correct, rt, timedOut});
@@ -908,11 +908,13 @@ function completeVSTrial(correct, rt, timedOut){
   $('vsRunningScore').textContent = `${c}/${vsResultsArr.length}`;
   vsIndex++;
   $('vsNote').textContent = timedOut
-    ? 'Time expired — moving to the next trial…'
+    ? 'Time expired — opening the next trial…'
     : correct
-      ? 'Correct — moving to the next trial…'
-      : 'Not quite — moving to the next trial…';
-  vsAdvanceTimer = setTimeout(nextVSTrial, VS_FEEDBACK_MS);
+      ? 'Correct — recorded. The next trial opens at the 5-second mark.'
+      : 'Response recorded. The next trial opens at the 5-second mark.';
+  // Every trial occupies exactly five seconds from stimulus onset.
+  // An early answer is recorded immediately but never starts a new delay.
+  vsAdvanceTimer = setTimeout(nextVSTrial, remainingMs);
 }
 
 async function finishVS(){
