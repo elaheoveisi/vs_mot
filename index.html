@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07090B">
 <title>iHuman LAB — Visual Search &amp; Tracking Instruments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -149,36 +150,162 @@
   .settingsnote{font-family:var(--mono);font-size:13px;color:var(--text-dim);margin-top:6px;}
   .warn{color:var(--amber);}
   .empty{font-family:var(--mono);font-size:15px;color:var(--text-dim);padding:20px 0;text-align:center;}
+
+  /* ---------- polished lab shell ---------- */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+    background-image:
+      linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+    background-size:42px 42px;
+    mask-image:linear-gradient(to bottom,black,transparent 88%);
+  }
+  .wrap{max-width:1080px;}
+  .site-header{
+    display:block;margin-bottom:30px;padding:18px 20px 0;border:1px solid rgba(255,255,255,.09);
+    border-radius:18px;background:rgba(12,15,18,.82);backdrop-filter:blur(18px);
+    box-shadow:0 24px 70px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.035);
+    overflow:hidden;
+  }
+  .brand-suite{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding-bottom:17px;}
+  .logo-frame{
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    min-width:88px;height:70px;padding:8px 12px;border-radius:13px;
+    background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(226,226,226,.92));
+    border:1px solid rgba(255,255,255,.35);box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  .logo-frame img{display:block;max-width:100%;max-height:54px;width:auto;height:auto;object-fit:contain;}
+  .logo-frame.ihuman{width:92px;}
+  .logo-frame.osu{width:96px;}
+  .brand-copy{min-width:0;}
+  .brand-eyebrow{
+    display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--cyan);
+    font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .brand-eyebrow::before{content:"";width:25px;height:2px;background:var(--cyan);border-radius:99px;}
+  .brand-copy h1{margin:0;font-family:var(--mono);font-size:clamp(20px,3vw,28px);line-height:1.15;letter-spacing:.025em;}
+  .brand-copy h1 span{color:var(--cyan);}
+  .brand-copy p{margin:6px 0 0;color:var(--text-dim);font-size:13px;letter-spacing:.025em;}
+  .topnav{
+    display:flex;justify-content:flex-end;gap:6px;margin:0 -20px;padding:10px 20px;
+    border-top:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.16);
+  }
+  .topnav .navbtn{border-color:transparent;border-radius:999px;padding:8px 13px;}
+  .topnav .navbtn:hover,.topnav .navbtn:focus-visible{background:rgba(254,92,0,.1);border-color:rgba(254,92,0,.35);}
+
+  .hero-panel{
+    position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,.7fr);gap:28px;
+    padding:clamp(24px,4vw,42px);margin-bottom:26px;border:1px solid rgba(254,92,0,.24);border-radius:18px;
+    background:
+      radial-gradient(circle at 12% 10%,rgba(254,92,0,.16),transparent 38%),
+      linear-gradient(135deg,rgba(25,29,33,.97),rgba(12,15,18,.97));
+    box-shadow:0 22px 60px rgba(0,0,0,.28);overflow:hidden;
+  }
+  .hero-panel::after{
+    content:"";position:absolute;right:-90px;top:-110px;width:260px;height:260px;border-radius:50%;
+    border:1px solid rgba(254,92,0,.14);box-shadow:0 0 0 34px rgba(254,92,0,.035),0 0 0 68px rgba(254,92,0,.022);
+    pointer-events:none;
+  }
+  .hero-copy{position:relative;z-index:1;align-self:center;}
+  .hero-kicker{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.15em;color:var(--cyan);text-transform:uppercase;}
+  .hero-copy h2{margin:10px 0 12px;max-width:650px;font-family:var(--mono);font-size:clamp(27px,4.8vw,45px);line-height:1.06;letter-spacing:-.045em;}
+  .hero-copy h2 span{color:var(--cyan);}
+  .hero-copy p{max-width:650px;margin:0;color:#AAB5BC;font-size:16.5px;line-height:1.65;}
+  .feature-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:21px;}
+  .feature-pill{
+    display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(255,255,255,.09);border-radius:999px;
+    background:rgba(255,255,255,.035);color:var(--text-dim);font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  }
+  .feature-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px rgba(254,92,0,.8);}
+  .participant-card{
+    position:relative;z-index:1;align-self:center;padding:20px;border:1px solid rgba(255,255,255,.11);border-radius:15px;
+    background:rgba(6,8,10,.65);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 18px 40px rgba(0,0,0,.2);
+  }
+  .participant-label{margin-bottom:4px;color:var(--cyan);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;}
+  .participant-card h3{margin:0 0 7px;font-family:var(--mono);font-size:19px;}
+  .participant-card > p{margin:0 0 16px;color:var(--text-dim);font-size:13.5px;line-height:1.45;}
+  .participant-card .fieldrow{display:block;padding:0;border:0;}
+  .participant-card .fieldrow label{display:block;margin-bottom:7px;font-family:var(--mono);font-size:12px;color:#AAB5BC;}
+  .participant-card .fieldrow .hint{display:inline;margin-left:5px;font-size:11px;}
+  .participant-card .fieldrow input[type=text]{
+    width:100%!important;padding:11px 12px!important;text-align:left!important;border-radius:8px!important;
+    border-color:rgba(255,255,255,.12);background:#12171C;
+  }
+  .participant-card .fieldrow input[type=text]:focus-visible{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(254,92,0,.1);}
+  .participant-note{display:flex;gap:8px;align-items:flex-start;margin-top:13px;color:#8F9BA3;font-family:var(--mono);font-size:10.5px;line-height:1.45;}
+  .participant-note svg{flex:0 0 auto;margin-top:1px;color:var(--cyan);}
+
+  .section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin:0 2px 13px;}
+  .section-head h2{margin:0;font-family:var(--mono);font-size:17px;letter-spacing:.035em;}
+  .section-head p{margin:0;color:var(--text-dim);font-family:var(--mono);font-size:11.5px;}
+  .grid2{gap:18px;}
+  .card{
+    position:relative;min-height:275px;padding:23px;border-radius:16px;overflow:hidden;
+    background:linear-gradient(145deg,rgba(24,29,34,.96),rgba(14,17,20,.98));
+    box-shadow:0 18px 42px rgba(0,0,0,.22);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+  }
+  .card::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--accent),transparent 74%);}
+  .card::after{content:"";position:absolute;right:-42px;top:-42px;width:145px;height:145px;border-radius:50%;background:var(--accent);opacity:.035;}
+  .card:hover,.card:focus-visible{transform:translateY(-5px);box-shadow:0 24px 55px rgba(0,0,0,.32);}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1;}
+  .module-icon{
+    display:grid;place-items:center;width:50px;height:50px;border-radius:13px;color:var(--accent);
+    border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);background:color-mix(in srgb,var(--accent) 8%,transparent);
+  }
+  .module-icon svg{width:28px;height:28px;}
+  .card h2,.card p,.card-footer{position:relative;z-index:1;}
+  .card h2{font-size:24px;letter-spacing:-.02em;}
+  .card p{font-size:15.5px;line-height:1.58;}
+  .card-footer{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-top:auto;padding-top:11px;border-top:1px solid rgba(255,255,255,.07);}
+  .card-footer .meta{display:grid;gap:2px;margin:0;}
+  .card-footer .meta span:last-child{font-size:10.5px;}
+  .card .go{display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .card .go::after{content:"";width:22px;height:1px;background:currentColor;transition:width .2s ease;}
+  .card:hover .go::after{width:31px;}
+
+  .panel{border-radius:16px;box-shadow:0 18px 45px rgba(0,0,0,.2);}
+  canvas{border-radius:12px;box-shadow:0 16px 38px rgba(0,0,0,.24);}
+  .foot{margin-top:32px;padding:18px 0;border-top:1px solid rgba(255,255,255,.06);}
+
+  @media (max-width:760px){
+    body{padding:12px 10px 42px;}
+    .site-header{padding:14px 14px 0;border-radius:15px;}
+    .brand-suite{grid-template-columns:auto 1fr;gap:13px;}
+    .logo-frame{height:58px;min-width:72px;padding:7px 9px;}
+    .logo-frame.ihuman{width:76px;}
+    .logo-frame.osu{grid-column:1/-1;width:100%;height:47px;background:rgba(255,255,255,.96);}
+    .logo-frame.osu img{max-height:34px;}
+    .brand-copy h1{font-size:19px;}
+    .brand-copy p{font-size:11px;}
+    .topnav{justify-content:flex-start;overflow-x:auto;margin:0 -14px;padding:9px 14px;scrollbar-width:none;}
+    .topnav::-webkit-scrollbar{display:none;}
+    .topnav .navbtn{white-space:nowrap;}
+    .hero-panel{grid-template-columns:1fr;gap:22px;padding:24px 18px;border-radius:15px;}
+    .hero-copy h2{font-size:32px;}
+    .participant-card{padding:17px;}
+    .section-head{align-items:start;flex-direction:column;gap:4px;}
+    .card{min-height:255px;}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="brand">
-      <div class="radar" aria-hidden="true">
-        <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="46" fill="none" stroke="#232B32" stroke-width="1"/>
-          <circle cx="50" cy="50" r="30" fill="none" stroke="#232B32" stroke-width="1"/>
-          <circle cx="50" cy="50" r="14" fill="none" stroke="#232B32" stroke-width="1"/>
-          <g class="sweep">
-            <path d="M50 50 L50 4 A46 46 0 0 1 88 28 Z" fill="url(#g)"/>
-          </g>
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#FE5C00" stop-opacity="0.65"/>
-              <stop offset="100%" stop-color="#FE5C00" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="2" fill="#FE5C00"/>
-        </svg>
+  <header class="site-header">
+    <div class="brand-suite">
+      <div class="logo-frame ihuman" title="iHuman Lab">
+        <img src="https://raw.githubusercontent.com/elaheoveisi/lab-website/main/images/logo_transparent.png" alt="iHuman Lab logo">
       </div>
-      <div>
-        <h1>iHuman LAB</h1>
-        <div class="sub">VISUAL SEARCH // MULTIPLE OBJECT TRACKING</div>
+      <div class="brand-copy">
+        <div class="brand-eyebrow">Cognitive performance suite</div>
+        <h1>Visual Search <span>&amp;</span> Tracking</h1>
+        <p>iHuman Lab · Oklahoma State University</p>
+      </div>
+      <div class="logo-frame osu" title="Oklahoma State University">
+        <img src="https://brand.okstate.edu/site-files/images/brand-guide/primary-brand.png" alt="Oklahoma State University logo">
       </div>
     </div>
-    <nav>
+    <nav class="topnav" aria-label="Primary navigation">
       <button class="navbtn" onclick="showScreen('menu')">INSTRUMENTS</button>
       <button class="navbtn" onclick="openSettings()">SETTINGS</button>
       <button class="navbtn" onclick="showScreen('results')">MY RESULTS</button>
@@ -188,32 +315,64 @@
 
   <!-- MENU -->
   <section id="menu" class="screen active">
-    <div class="panel" style="margin-bottom:16px;padding:16px 20px;border-color:var(--pink);">
-      <div class="settingsnote" style="font-size:14px;color:var(--pink);margin-bottom:10px;">
-        ⚠ Please write your name below before running a module — and leave Settings as they are so everyone's results stay comparable.
+    <div class="hero-panel">
+      <div class="hero-copy">
+        <div class="hero-kicker">Interactive attention instruments</div>
+        <h2>Measure attention.<br><span>Track performance.</span></h2>
+        <p>Run standardized visual-search and multiple-object-tracking tasks directly in your browser. Review accuracy, response time, and session history without installing software.</p>
+        <div class="feature-row" aria-label="Application features">
+          <span class="feature-pill">Browser based</span>
+          <span class="feature-pill">Instant scoring</span>
+          <span class="feature-pill">Configurable trials</span>
+        </div>
       </div>
-      <div class="fieldrow" style="border-bottom:none;padding:0;">
-        <label for="playerNameInput">Your name
-          <span class="hint">shown on the shared leaderboard</span>
-        </label>
-        <input type="text" id="playerNameInput" placeholder="e.g. Elahe" style="width:180px;text-align:left;" maxlength="40">
+      <div class="participant-card">
+        <div class="participant-label">Participant setup</div>
+        <h3>Before you begin</h3>
+        <p>Enter your name, then choose one of the two instruments below.</p>
+        <div class="fieldrow">
+          <label for="playerNameInput">Your name <span class="hint">shown on the shared leaderboard</span></label>
+          <input type="text" id="playerNameInput" placeholder="e.g. Elahe" maxlength="40" autocomplete="name">
+        </div>
+        <div class="participant-note">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7v3.2L3.4 15A1 1 0 0 0 4.3 16.5h15.4a1 1 0 0 0 .9-1.5L19 12.2V9a7 7 0 0 0-7-7Zm0 20a3.5 3.5 0 0 0 3.3-2.3H8.7A3.5 3.5 0 0 0 12 22Z"/></svg>
+          <span>Please keep the default settings so results remain comparable.</span>
+        </div>
+        <div class="settingsnote warn" id="nameWarning" style="display:none;">Enter your name before running a module.</div>
       </div>
-      <div class="settingsnote warn" id="nameWarning" style="display:none;">Enter your name before running a module.</div>
+    </div>
+    <div class="section-head">
+      <h2>Choose an instrument</h2>
+      <p>Two tasks · immediate session feedback</p>
     </div>
     <div class="grid2">
       <div class="card vs" tabindex="0" role="button" onclick="requireNameThen(startVS)" onkeydown="if(event.key==='Enter')requireNameThen(startVS)">
-        <span class="tag">MODULE 01</span>
+        <div class="card-top">
+          <span class="tag">MODULE 01</span>
+          <div class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M5 5h7v7H5V5Zm15 0h7v7h-7V5ZM5 20h7v7H5v-7Zm15 0h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"/><path d="m20.5 23.5 2 2 4-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
         <h2>VISUAL SEARCH</h2>
         <p>You'll see a grid of T shapes. Most are rotated so they look uneven — only one is a straight, upright, symmetric T. Click that one, as fast as you can.</p>
-        <div class="meta"><span id="vsMetaTrials">16 TRIALS</span><span>configurable in Settings</span></div>
-        <div class="go">RUN MODULE →</div>
+        <div class="card-footer">
+          <div class="meta"><span id="vsMetaTrials">16 TRIALS</span><span>configurable in Settings</span></div>
+          <div class="go">RUN</div>
+        </div>
       </div>
       <div class="card mot" tabindex="0" role="button" onclick="requireNameThen(startMOT)" onkeydown="if(event.key==='Enter')requireNameThen(startMOT)">
-        <span class="tag">MODULE 02</span>
+        <div class="card-top">
+          <span class="tag">MODULE 02</span>
+          <div class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="8" r="3" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="24" r="3" stroke="currentColor" stroke-width="2"/><circle cx="23" cy="23" r="3" stroke="currentColor" stroke-width="2"/><path d="M11 10.5 21 8.8M9.5 12l.5 9m3-1 8-9m-8 13h7" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.5 2.5"/></svg>
+          </div>
+        </div>
         <h2>OBJECT TRACKING</h2>
         <p>A few dots will flash to show you the targets. Then all the dots start moving and look identical. Keep your eyes on the original targets until they stop.</p>
-        <div class="meta"><span id="motMetaTrials">5 TRIALS</span><span>configurable in Settings</span></div>
-        <div class="go">RUN MODULE →</div>
+        <div class="card-footer">
+          <div class="meta"><span id="motMetaTrials">5 TRIALS</span><span>configurable in Settings</span></div>
+          <div class="go">RUN</div>
+        </div>
       </div>
     </div>
   </section>
