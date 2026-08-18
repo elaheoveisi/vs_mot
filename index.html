@@ -778,15 +778,13 @@ const vsCtx = vsCanvas.getContext('2d');
 const VS_BG = '#DCDBD6', VS_GLYPH = '#1B1D1F', VS_TARGET_HILITE = '#FE5C00';
 let vsIndex = 0, vsResultsArr = [], vsOnset = 0, vsAwaiting = false;
 let vsCells = [], vsTargetIdx = -1;
-let vsResponseTimer = null, vsCountdownTimer = null, vsAdvanceTimer = null;
+let vsResponseTimer = null, vsCountdownTimer = null;
 
 function clearVSTimers(){
   clearTimeout(vsResponseTimer);
   clearInterval(vsCountdownTimer);
-  clearTimeout(vsAdvanceTimer);
   vsResponseTimer = null;
   vsCountdownTimer = null;
-  vsAdvanceTimer = null;
 }
 
 function startVS(){
@@ -900,21 +898,15 @@ function vsTimeout(){
 function completeVSTrial(correct, rt, timedOut){
   if(!vsAwaiting) return;
   vsAwaiting = false;
-  const remainingMs = timedOut ? 0 : Math.max(0, VS_RESPONSE_LIMIT_MS - rt);
   clearVSTimers();
   flash(correct ? 'correct' : 'incorrect');
   vsResultsArr.push({trial: vsIndex+1, correct, rt, timedOut});
   const c = vsResultsArr.filter(r=>r.correct).length;
   $('vsRunningScore').textContent = `${c}/${vsResultsArr.length}`;
   vsIndex++;
-  $('vsNote').textContent = timedOut
-    ? 'Time expired — opening the next trial…'
-    : correct
-      ? 'Correct — recorded. The next trial opens at the 5-second mark.'
-      : 'Response recorded. The next trial opens at the 5-second mark.';
-  // Every trial occupies exactly five seconds from stimulus onset.
-  // An early answer is recorded immediately but never starts a new delay.
-  vsAdvanceTimer = setTimeout(nextVSTrial, remainingMs);
+  // Advance immediately after an answer. If there is no answer, vsTimeout
+  // calls this function at the five-second deadline and advances then.
+  nextVSTrial();
 }
 
 async function finishVS(){
