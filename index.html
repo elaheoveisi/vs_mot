@@ -227,11 +227,13 @@
   .participant-card .fieldrow{display:block;padding:0;border:0;}
   .participant-card .fieldrow label{display:block;margin-bottom:7px;font-family:var(--mono);font-size:12px;color:#AAB5BC;}
   .participant-card .fieldrow .hint{display:inline;margin-left:5px;font-size:11px;}
-  .participant-card .fieldrow input[type=text]{
+  .participant-card .fieldrow input[type=text],
+  .participant-card .fieldrow input[type=email]{
     width:100%!important;padding:11px 12px!important;text-align:left!important;border-radius:8px!important;
     border-color:rgba(255,255,255,.12);background:#12171C;
   }
-  .participant-card .fieldrow input[type=text]:focus-visible{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(254,92,0,.1);}
+  .participant-card .fieldrow input[type=text]:focus-visible,
+  .participant-card .fieldrow input[type=email]:focus-visible{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(254,92,0,.1);}
   .participant-note{display:flex;gap:8px;align-items:flex-start;margin-top:13px;color:#8F9BA3;font-family:var(--mono);font-size:10.5px;line-height:1.45;}
   .participant-note svg{flex:0 0 auto;margin-top:1px;color:var(--cyan);}
 
@@ -309,7 +311,6 @@
       <button class="navbtn" onclick="showScreen('menu')">INSTRUMENTS</button>
       <button class="navbtn" onclick="openSettings()">SETTINGS</button>
       <button class="navbtn" onclick="showScreen('results')">MY RESULTS</button>
-      <button class="navbtn" onclick="showScreen('leaderboard')">LEADERBOARD</button>
     </nav>
   </header>
 
@@ -329,16 +330,24 @@
       <div class="participant-card">
         <div class="participant-label">Participant setup</div>
         <h3>Before you begin</h3>
-        <p>Enter your name, then choose one of the two instruments below.</p>
+        <p>Enter your name and email, then choose one of the two instruments below.</p>
         <div class="fieldrow">
-          <label for="playerNameInput">Your name <span class="hint">shown on the shared leaderboard</span></label>
-          <input type="text" id="playerNameInput" placeholder="e.g. Elahe" maxlength="40" autocomplete="name">
+          <label for="playerNameInput">Your name <span class="hint">included with your results</span></label>
+          <input type="text" id="playerNameInput" placeholder="e.g. Elahe" maxlength="40" autocomplete="name" required>
+        </div>
+        <div class="fieldrow" style="margin-top:12px;">
+          <label for="playerEmailInput">Your email <span class="hint">required</span></label>
+          <input type="email" id="playerEmailInput" placeholder="name@example.com" maxlength="120" autocomplete="email" required>
         </div>
         <div class="participant-note">
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7v3.2L3.4 15A1 1 0 0 0 4.3 16.5h15.4a1 1 0 0 0 .9-1.5L19 12.2V9a7 7 0 0 0-7-7Zm0 20a3.5 3.5 0 0 0 3.3-2.3H8.7A3.5 3.5 0 0 0 12 22Z"/></svg>
-          <span>Please keep the default settings so results remain comparable.</span>
+          <span>If you were not comfortable during your first round or needed time to become familiar with the test, you may complete each test up to three times total.</span>
         </div>
-        <div class="settingsnote warn" id="nameWarning" style="display:none;">Enter your name before running a module.</div>
+        <div class="participant-note">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7v3.2L3.4 15A1 1 0 0 0 4.3 16.5h15.4a1 1 0 0 0 .9-1.5L19 12.2V9a7 7 0 0 0-7-7Zm0 20a3.5 3.5 0 0 0 3.3-2.3H8.7A3.5 3.5 0 0 0 12 22Z"/></svg>
+          <span>Your email is included with the results sent to the study team. Please keep the default settings so results remain comparable.</span>
+        </div>
+        <div class="settingsnote warn" id="participantWarning" style="display:none;"></div>
       </div>
     </div>
     <div class="section-head">
@@ -346,7 +355,7 @@
       <p>Two tasks · immediate session feedback</p>
     </div>
     <div class="grid2">
-      <div class="card vs" tabindex="0" role="button" onclick="requireNameThen(startVS)" onkeydown="if(event.key==='Enter')requireNameThen(startVS)">
+      <div class="card vs" tabindex="0" role="button" onclick="requireParticipantThen('vs', startVS)" onkeydown="if(event.key==='Enter')requireParticipantThen('vs', startVS)">
         <div class="card-top">
           <span class="tag">MODULE 01</span>
           <div class="module-icon" aria-hidden="true">
@@ -356,11 +365,11 @@
         <h2>VISUAL SEARCH</h2>
         <p>You'll see a grid of T shapes. Most are rotated so they look uneven — only one is a straight, upright, symmetric T. Click that one, as fast as you can.</p>
         <div class="card-footer">
-          <div class="meta"><span id="vsMetaTrials">16 TRIALS</span><span>configurable in Settings</span></div>
+          <div class="meta"><span id="vsMetaTrials">10 TRIALS</span><span id="vsAttemptMeta">3 attempts available</span></div>
           <div class="go">RUN</div>
         </div>
       </div>
-      <div class="card mot" tabindex="0" role="button" onclick="requireNameThen(startMOT)" onkeydown="if(event.key==='Enter')requireNameThen(startMOT)">
+      <div class="card mot" tabindex="0" role="button" onclick="requireParticipantThen('mot', startMOT)" onkeydown="if(event.key==='Enter')requireParticipantThen('mot', startMOT)">
         <div class="card-top">
           <span class="tag">MODULE 02</span>
           <div class="module-icon" aria-hidden="true">
@@ -370,24 +379,10 @@
         <h2>OBJECT TRACKING</h2>
         <p>A few dots will flash to show you the targets. Then all the dots start moving and look identical. Keep your eyes on the original targets until they stop.</p>
         <div class="card-footer">
-          <div class="meta"><span id="motMetaTrials">5 TRIALS</span><span>configurable in Settings</span></div>
+          <div class="meta"><span id="motMetaTrials">5 TRIALS</span><span id="motAttemptMeta">3 attempts available</span></div>
           <div class="go">RUN</div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- LEADERBOARD -->
-  <section id="leaderboard" class="screen">
-    <div class="panel">
-      <div class="taskbar">
-        <h2 style="font-family:var(--mono);font-size:19px;margin:0;">SHARED LEADERBOARD</h2>
-        <div>
-          <button class="navbtn" onclick="renderLeaderboard('vs')" id="lbTabVs">VISUAL SEARCH</button>
-          <button class="navbtn" onclick="renderLeaderboard('mot')" id="lbTabMot">OBJECT TRACKING</button>
-        </div>
-      </div>
-      <div id="leaderboardBody"><div class="empty">Loading…</div></div>
     </div>
   </section>
 
@@ -480,7 +475,7 @@
       </div>
       <table id="vsBreakdown"><thead><tr><th>Trial</th><th>Result</th><th>RT</th></tr></thead><tbody></tbody></table>
       <div class="respbar" style="margin-top:22px;">
-        <button class="primary" onclick="startVS()">RUN AGAIN</button>
+        <button class="primary" id="vsRunAgainBtn" onclick="requireParticipantThen('vs', startVS)">RUN AGAIN</button>
         <button class="ghost" onclick="showScreen('menu')">BACK TO INSTRUMENTS</button>
       </div>
     </div>
@@ -512,7 +507,7 @@
       </div>
       <table id="motBreakdown"><thead><tr><th>Trial</th><th>Targets</th><th>Correct</th><th>False alarms</th></tr></thead><tbody></tbody></table>
       <div class="respbar" style="margin-top:22px;">
-        <button class="primary" onclick="startMOT()">RUN AGAIN</button>
+        <button class="primary" id="motRunAgainBtn" onclick="requireParticipantThen('mot', startMOT)">RUN AGAIN</button>
         <button class="ghost" onclick="showScreen('menu')">BACK TO INSTRUMENTS</button>
       </div>
     </div>
@@ -545,7 +540,6 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   if(id==='results') renderHistory();
-  if(id==='leaderboard') renderLeaderboard();
 }
 function flash(kind){
   const el = $('flash');
@@ -560,26 +554,84 @@ function shuffle(arr){
   return a;
 }
 
-/* ---------- player name (localStorage — this device only) ---------- */
+/* ---------- participant details and attempt limits ---------- */
+const MAX_ATTEMPTS_PER_TEST = 3;
 let currentPlayerName = '';
-async function loadPlayerName(){
+let currentPlayerEmail = '';
+
+async function loadParticipant(){
   try{
     currentPlayerName = localStorage.getItem('ihuman_playerName') || '';
+    currentPlayerEmail = localStorage.getItem('ihuman_playerEmail') || '';
   }catch(e){ /* none saved yet */ }
   $('playerNameInput').value = currentPlayerName;
+  $('playerEmailInput').value = currentPlayerEmail;
+  updateAttemptUI();
 }
 $('playerNameInput').addEventListener('change', ()=>{
   currentPlayerName = $('playerNameInput').value.trim();
   try{ localStorage.setItem('ihuman_playerName', currentPlayerName); }catch(e){}
 });
-function requireNameThen(fn){
+$('playerEmailInput').addEventListener('input', ()=>{
+  currentPlayerEmail = $('playerEmailInput').value.trim().toLowerCase();
+  try{ localStorage.setItem('ihuman_playerEmail', currentPlayerEmail); }catch(e){}
+  updateAttemptUI();
+});
+
+function attemptKey(game){
+  return `ihuman_attempts_${game}_${encodeURIComponent(currentPlayerEmail.toLowerCase())}`;
+}
+function getAttemptCount(game){
+  if(!currentPlayerEmail) return 0;
+  try{ return Math.max(0, parseInt(localStorage.getItem(attemptKey(game)) || '0') || 0); }
+  catch(e){ return 0; }
+}
+function incrementAttemptCount(game){
+  const next = Math.min(MAX_ATTEMPTS_PER_TEST, getAttemptCount(game) + 1);
+  try{ localStorage.setItem(attemptKey(game), String(next)); }catch(e){}
+  updateAttemptUI();
+  return next;
+}
+function updateAttemptUI(){
+  ['vs','mot'].forEach(game=>{
+    const used = getAttemptCount(game);
+    const remaining = Math.max(0, MAX_ATTEMPTS_PER_TEST - used);
+    const meta = $(`${game}AttemptMeta`);
+    if(meta) meta.textContent = `${remaining} of ${MAX_ATTEMPTS_PER_TEST} attempts remaining`;
+    const btn = $(`${game}RunAgainBtn`);
+    if(btn){
+      btn.disabled = remaining === 0;
+      btn.textContent = remaining === 0 ? 'ATTEMPT LIMIT REACHED' : 'RUN AGAIN';
+    }
+  });
+}
+function showParticipantWarning(message, focusId){
+  const warning = $('participantWarning');
+  warning.textContent = message;
+  warning.style.display = 'block';
+  if(!$('menu').classList.contains('active')) showScreen('menu');
+  if(focusId) $(focusId).focus();
+}
+function requireParticipantThen(game, fn){
   currentPlayerName = $('playerNameInput').value.trim();
+  currentPlayerEmail = $('playerEmailInput').value.trim().toLowerCase();
   if(!currentPlayerName){
-    $('nameWarning').style.display = 'block';
-    $('playerNameInput').focus();
+    showParticipantWarning('Enter your name before running a module.', 'playerNameInput');
     return;
   }
-  $('nameWarning').style.display = 'none';
+  if(!currentPlayerEmail || !$('playerEmailInput').checkValidity()){
+    showParticipantWarning('Enter a valid email address before running a module.', 'playerEmailInput');
+    return;
+  }
+  try{
+    localStorage.setItem('ihuman_playerName', currentPlayerName);
+    localStorage.setItem('ihuman_playerEmail', currentPlayerEmail);
+  }catch(e){}
+  if(getAttemptCount(game) >= MAX_ATTEMPTS_PER_TEST){
+    showParticipantWarning(`You have completed all ${MAX_ATTEMPTS_PER_TEST} allowed attempts for this test.`);
+    return;
+  }
+  $('participantWarning').style.display = 'none';
   fn();
 }
 
@@ -683,14 +735,14 @@ function resetSettings(){
 }
 
 /* ---------- storage ----------
-   Personal history stays in this browser's localStorage.
-   The shared leaderboard is saved to a Google Sheet through a small
-   Apps Script "Web App" endpoint — paste your deployment URL below.
-   See the setup steps for how to create it. */
-const LEADERBOARD_API_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+   Personal history stays in this browser's localStorage. Completed results
+   are sent through the private email Apps Script endpoint once configured. */
+const RESULTS_EMAIL_API_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
 async function saveSession(entry){
   entry.name = currentPlayerName || 'Anonymous';
+  entry.email = currentPlayerEmail;
+  entry.attempt = incrementAttemptCount(entry.game);
 
   try{
     let hist = JSON.parse(localStorage.getItem('ihuman_history') || '[]');
@@ -698,14 +750,14 @@ async function saveSession(entry){
     localStorage.setItem('ihuman_history', JSON.stringify(hist));
   }catch(e){ console.error('local save failed', e); }
 
-  if(LEADERBOARD_API_URL.startsWith('PASTE_')) return; // not configured yet
+  if(RESULTS_EMAIL_API_URL.startsWith('PASTE_')) return; // not configured yet
   try{
-    await fetch(LEADERBOARD_API_URL, {
+    await fetch(RESULTS_EMAIL_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight
       body: JSON.stringify(entry)
     });
-  }catch(e){ console.error('leaderboard save failed', e); }
+  }catch(e){ console.error('email result send failed', e); }
 }
 async function loadHistory(){
   try{ return JSON.parse(localStorage.getItem('ihuman_history') || '[]'); }
@@ -735,39 +787,6 @@ async function renderHistory(){
   body.innerHTML = `<table><thead><tr><th>When</th><th>Module</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-async function loadLeaderboard(){
-  if(LEADERBOARD_API_URL.startsWith('PASTE_')) return null; // signals "not configured"
-  try{
-    const res = await fetch(LEADERBOARD_API_URL);
-    return await res.json();
-  }catch(e){ console.error('leaderboard load failed', e); return []; }
-}
-let lbActiveTab = 'vs';
-async function renderLeaderboard(tab){
-  if(tab) lbActiveTab = tab;
-  $('lbTabVs').style.color = lbActiveTab==='vs' ? 'var(--amber)' : '';
-  $('lbTabMot').style.color = lbActiveTab==='mot' ? 'var(--cyan)' : '';
-  const body = $('leaderboardBody');
-  body.innerHTML = '<div class="empty">Loading…</div>';
-  const data = await loadLeaderboard();
-  if(data === null){
-    body.innerHTML = '<div class="empty">Shared leaderboard isn\'t connected yet — add your Google Sheet URL in the code (LEADERBOARD_API_URL).</div>';
-    return;
-  }
-  const all = data.filter(e=>e.game===lbActiveTab);
-  if(!all.length){
-    body.innerHTML = '<div class="empty">No shared results yet for this module.</div>';
-    return;
-  }
-  const sorted = all.slice().sort((a,b)=> b.accuracy - a.accuracy || (a.meanRT||9999)-(b.meanRT||9999));
-  const rows = sorted.map((e,i)=>{
-    const d = new Date(e.date);
-    const when = d.toLocaleDateString();
-    const detail = lbActiveTab==='vs' ? `${e.meanRT}ms RT` : `${e.falseAlarms} FA avg`;
-    return `<tr><td>${i+1}</td><td>${e.name}</td><td>${e.accuracy}%</td><td>${detail}</td><td>${when}</td></tr>`;
-  }).join('');
-  body.innerHTML = `<table><thead><tr><th>#</th><th>Name</th><th>Accuracy</th><th>Detail</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
 
 /* =========================================================
    VISUAL SEARCH — find the one mirror-symmetric (upright) glyph
@@ -1089,7 +1108,7 @@ async function finishMOT(){
 
 /* ---------- init ---------- */
 loadConfig();
-loadPlayerName();
+loadParticipant();
 </script>
 </body>
 </html>
