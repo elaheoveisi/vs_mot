@@ -6,7 +6,98 @@
 <meta name="theme-color" content="#07090B">
 <title>iHuman LAB — Visual Search &amp; Tracking Instruments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">from pathlib import Path
+import re
+
+src = Path("/mnt/data/Pasted text(20260823-233722).txt")
+text = src.read_text(encoding="utf-8")
+
+# 1) Make canvas display width match the intended larger size.
+text = text.replace(
+    "display:block;width:100%;max-width:560px;height:auto;margin:0 auto;",
+    "display:block;width:100%;max-width:800px;height:auto;margin:0 auto;"
+)
+
+# 2) Fix VS/MOT canvas dimensions.
+text = text.replace(
+    '<canvas id="vsCanvas" width="800" height="800"></canvas>',
+    '<canvas id="vsCanvas" width="800" height="550"></canvas>'
+)
+text = text.replace(
+    '<canvas id="motCanvas" width="8000" height="800"></canvas>',
+    '<canvas id="motCanvas" width="800" height="550"></canvas>'
+)
+
+# 3) Update participant instructions and remove name field HTML.
+text = text.replace(
+    '<p>Enter your name and email, then choose one of the two instruments below.</p>',
+    '<p>Enter your email, then choose one of the two instruments below.</p>'
+)
+
+name_field_pattern = re.compile(
+    r'\s*<div class="fieldrow">\s*'
+    r'<label for="playerNameInput">Your name <span class="hint">included with your results</span></label>\s*'
+    r'<input type="text" id="playerNameInput" placeholder="e\.g\. Elahe" maxlength="40" autocomplete="name" required>\s*'
+    r'</div>',
+    re.MULTILINE
+)
+text = name_field_pattern.sub("", text)
+
+# Remove extra top margin from email field since it is now the only field.
+text = text.replace(
+    '<div class="fieldrow" style="margin-top:12px;">\n          <label for="playerEmailInput">',
+    '<div class="fieldrow">\n          <label for="playerEmailInput">'
+)
+
+# 4) Remove all currentPlayerName logic.
+text = text.replace("let currentPlayerName = '';\n", "")
+text = text.replace("    currentPlayerName = localStorage.getItem('ihuman_playerName') || '';\n", "")
+text = text.replace("  $('playerNameInput').value = currentPlayerName;\n", "")
+
+# Remove name change listener block.
+text = re.sub(
+    r"\n\$\('playerNameInput'\)\.addEventListener\('change', \(\)=>\{\n"
+    r"\s*currentPlayerName = \$\('playerNameInput'\)\.value\.trim\(\);\n"
+    r"\s*try\{ localStorage\.setItem\('ihuman_playerName', currentPlayerName\); \}catch\(e\)\{\}\n"
+    r"\}\);\n",
+    "\n",
+    text
+)
+
+# Remove name requirement and assignment inside requireParticipantThen.
+text = text.replace("  currentPlayerName = $('playerNameInput').value.trim();\n", "")
+text = re.sub(
+    r"\s*if\(!currentPlayerName\)\{\n"
+    r"\s*showParticipantWarning\('Enter your name before running a module\.', 'playerNameInput'\);\n"
+    r"\s*return;\n"
+    r"\s*\}\n",
+    "\n",
+    text
+)
+text = text.replace("    localStorage.setItem('ihuman_playerName', currentPlayerName);\n", "")
+
+# Remove name from saved session payload.
+text = text.replace("  entry.name = currentPlayerName || 'Anonymous';\n", "")
+
+# 5) Remove text-input-specific participant CSS where practical, leaving email styles.
+text = text.replace(
+    "  .participant-card .fieldrow input[type=text],\n  .participant-card .fieldrow input[type=email]{",
+    "  .participant-card .fieldrow input[type=email]{"
+)
+text = text.replace(
+    "  .participant-card .fieldrow input[type=text]:focus-visible,\n  .participant-card .fieldrow input[type=email]:focus-visible{",
+    "  .participant-card .fieldrow input[type=email]:focus-visible{"
+)
+
+out = Path("/mnt/data/ihuman_vs_mot_fixed.html")
+out.write_text(text, encoding="utf-8")
+
+print(f"Created: {out}")
+print("VS canvas:", re.search(r'<canvas id="vsCanvas"[^>]+>', text).group(0))
+print("MOT canvas:", re.search(r'<canvas id="motCanvas"[^>]+>', text).group(0))
+print("Name input remains:", "playerNameInput" in text)
+print("Name variable remains:", "currentPlayerName" in text)
+
 <style>
   :root{
     --bg:#0A0D10;
