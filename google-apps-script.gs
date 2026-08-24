@@ -6,7 +6,7 @@
  *   Who has access: Anyone
  */
 
-const SPREADSHEET_ID = '1S1mD2CJWAmTycCq7msOKrO4Vxg_7OXi4d4qnluPLdUg';
+const SPREADSHEET_ID = 'PASTE_YOUR_SPREADSHEET_ID_HERE';
 const SHEET_NAME = 'Leaderboard';
 const MAX_ATTEMPTS_PER_MODULE = 3;
 const HEADERS = [
@@ -82,6 +82,9 @@ function doPost(event) {
 }
 
 function getLeaderboardSheet_() {
+  if (SPREADSHEET_ID.indexOf('PASTE_') === 0) {
+    throw new Error('Add the private Google Sheet ID before deploying this script.');
+  }
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
