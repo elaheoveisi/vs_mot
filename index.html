@@ -87,6 +87,23 @@
   .screen{display:none;}
   .screen.active{display:block;}
 
+  /* Use the supplied iHuman Lab logo so the L stays white on dark screens. */
+  .brand-logo{
+    content:url("ihuman-logo.png");
+    height:48px;
+  }
+  .brand h1{display:none;}
+  .site-foot img[alt="iHuman Lab"]{
+    content:url("ihuman-logo.png");
+    height:32px !important;
+    width:auto;
+  }
+  .card.is-loading{
+    pointer-events:none;
+    border-color:var(--accent,var(--cyan));
+  }
+  .card.is-loading .go{opacity:0.8;}
+
   /* During an experiment, reserve the full viewport for the task. */
   body.task-mode{
     height:100vh;
@@ -552,6 +569,44 @@ function fitTaskCanvas(canvas){
   canvas.style.width = Math.floor(fittedWidth) + 'px';
   canvas.style.height = Math.floor(fittedWidth / aspect) + 'px';
 }
+
+// The Google Apps Script can take many seconds to wake up. Show immediate
+// feedback and start after a short check; the backend enforces the attempt
+// limit again when a completed result is saved.
+requireEmailThen = async function(fn, game){
+  currentEmail = $('playerEmailInput').value.trim().toLowerCase();
+  if(!EMAIL_RE.test(currentEmail)){
+    $('nameWarning').style.display = 'block';
+    $('nameWarning').textContent = 'Enter a valid email before running a module.';
+    $('playerEmailInput').focus();
+    return;
+  }
+  $('nameWarning').style.display = 'none';
+
+  const card = document.querySelector(game === 'vs' ? '.card.vs' : '.card.mot');
+  const action = card ? card.querySelector('.go') : null;
+  const previousAction = action ? action.textContent : '';
+  if(card) card.classList.add('is-loading');
+  if(action) action.textContent = 'CHECKING ATTEMPTS…';
+
+  let count = null;
+  try{
+    count = await Promise.race([
+      countAttempts(currentEmail, game),
+      new Promise(resolve => setTimeout(() => resolve(null), 1500))
+    ]);
+  }finally{
+    if(card) card.classList.remove('is-loading');
+    if(action) action.textContent = previousAction;
+  }
+
+  if(count !== null && count >= MAX_ATTEMPTS_PER_MODULE){
+    $('nameWarning').style.display = 'block';
+    $('nameWarning').textContent = `You've already played this module ${MAX_ATTEMPTS_PER_MODULE} times with this email — that's the limit for this study.`;
+    return;
+  }
+  fn();
+};
 let taskCanvasResizeTimer;
 window.addEventListener('resize', ()=>{
   clearTimeout(taskCanvasResizeTimer);
