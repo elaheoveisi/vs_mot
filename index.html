@@ -87,6 +87,74 @@
   .screen{display:none;}
   .screen.active{display:block;}
 
+  /* During an experiment, reserve the full viewport for the task. */
+  body.task-mode{
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+    padding:12px 16px;
+  }
+  body.task-mode .wrap{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  body.task-mode header{
+    flex:0 0 auto;
+    margin-bottom:8px;
+    padding-bottom:8px;
+  }
+  body.task-mode .brand-logo{height:42px;}
+  body.task-mode .brand h1{font-size:24px;}
+  body.task-mode .site-foot{display:none;}
+  body.task-mode .task-screen.active{
+    display:flex;
+    flex:1 1 auto;
+    min-height:0;
+  }
+  body.task-mode .task-panel{
+    width:100%;
+    height:100%;
+    min-height:0;
+    padding:12px 16px;
+    display:flex;
+    flex-direction:column;
+  }
+  body.task-mode .taskbar{flex:0 0 auto;margin-bottom:6px;}
+  body.task-mode .vs-legend{flex:0 0 auto;margin-bottom:6px;}
+  body.task-mode .respbar{flex:0 0 auto;margin-top:7px;}
+  body.task-mode .stagenote{flex:0 0 auto;margin-top:6px;}
+  .task-canvas-shell{
+    flex:1 1 auto;
+    min-height:0;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .task-canvas-shell canvas{
+    flex:none;
+    margin:0;
+  }
+  @media (max-height:760px){
+    body.task-mode .brand .sub,
+    body.task-mode .brand .affiliation{display:none;}
+    body.task-mode .brand-logo{height:34px;}
+    body.task-mode .brand h1{font-size:21px;}
+    body.task-mode .navbtn{padding:6px 9px;font-size:11px;}
+    body.task-mode .task-panel{padding:8px 12px;}
+    body.task-mode .taskbar{margin-bottom:4px;}
+    body.task-mode .vs-legend{margin-bottom:4px;}
+    body.task-mode .vs-legend-item svg{width:26px;height:26px;}
+    body.task-mode .vs-legend-item span{font-size:13px;}
+    body.task-mode .stagenote{font-size:12px;margin-top:4px;}
+    body.task-mode .respbar{margin-top:4px;}
+    body.task-mode button.primary{padding:7px 15px;font-size:12px;}
+  }
+
   /* instrument-plate signature: bevel edge + corner rivets, used on every panel/card */
   .instrument{position:relative;}
   .instrument::before{
@@ -361,8 +429,8 @@
   </section>
 
   <!-- VS TASK -->
-  <section id="vs" class="screen">
-    <div class="panel instrument"><span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+  <section id="vs" class="screen task-screen">
+    <div class="panel instrument task-panel"><span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
       <div class="taskbar">
         <div><span class="label">TRIAL</span> <span class="val" id="vsTrialNum">1/10</span></div>
         <div><span class="label">ITEMS</span> <span class="val" id="vsSetSize">—</span></div>
@@ -374,7 +442,9 @@
         <div class="vs-legend-item"><svg viewBox="0 0 40 40"><g transform="rotate(0 20 20)"><line x1="8" y1="14" x2="32" y2="14"/><line x1="20" y1="14" x2="20" y2="30"/></g></svg><span>↓</span></div>
         <div class="vs-legend-item"><svg viewBox="0 0 40 40"><g transform="rotate(270 20 20)"><line x1="8" y1="14" x2="32" y2="14"/><line x1="20" y1="14" x2="20" y2="30"/></g></svg><span>→</span></div>
       </div>
-      <canvas id="vsCanvas" width="1080" height="700"></canvas>
+      <div class="task-canvas-shell">
+        <canvas id="vsCanvas" width="1080" height="700"></canvas>
+      </div>
       <div class="stagenote" id="vsNote">Find the upright, symmetric T, then press the arrow key matching which way its stem points.</div>
     </div>
   </section>
@@ -396,14 +466,16 @@
   </section>
 
   <!-- MOT TASK -->
-  <section id="mot" class="screen">
-    <div class="panel instrument"><span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+  <section id="mot" class="screen task-screen">
+    <div class="panel instrument task-panel"><span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
       <div class="taskbar">
         <div><span class="label">TRIAL</span> <span class="val" id="motTrialNum">1/5</span></div>
         <div><span class="label">TARGETS</span> <span class="val" id="motTargetCount">—</span></div>
         <div><span class="label">PHASE</span> <span class="val" id="motPhase">—</span></div>
       </div>
-      <canvas id="motCanvas" width="1080" height="700"></canvas>
+      <div class="task-canvas-shell">
+        <canvas id="motCanvas" width="1080" height="700"></canvas>
+      </div>
       <div class="respbar">
         <button class="primary" id="motSubmitBtn" onclick="motSubmit()" disabled>SUBMIT SELECTION</button>
       </div>
@@ -461,24 +533,24 @@ function showScreen(id){
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
+  const isTask = id === 'vs' || id === 'mot';
+  document.body.classList.toggle('task-mode', isTask);
   if(id==='results') renderHistory();
   if(id==='leaderboard') renderLeaderboard();
-  if(id==='mot') fitTaskCanvas(motCanvas);
-  if(id==='vs') fitTaskCanvas(vsCanvas);
+  if(id==='mot') requestAnimationFrame(()=>fitTaskCanvas(motCanvas));
+  if(id==='vs') requestAnimationFrame(()=>fitTaskCanvas(vsCanvas));
 }
-// shrinks a task canvas (keeping its aspect ratio) just enough that the
-// page fits the viewport without scrolling — the canvas's drawing
-// coordinate space (width/height attrs) stays fixed, only its CSS size changes
+// Use the largest centered 1080:700 canvas that fits the space remaining
+// after the task labels and controls. The drawing coordinate space stays fixed.
 function fitTaskCanvas(canvas){
   if(!canvas) return;
-  canvas.style.width = '';
-  const overflow = document.documentElement.scrollHeight - window.innerHeight;
-  if(overflow > 0){
-    const rect = canvas.getBoundingClientRect();
-    const aspect = canvas.width / canvas.height;
-    const newHeight = Math.max(220, rect.height - overflow - 8);
-    canvas.style.width = (newHeight * aspect) + 'px';
-  }
+  const shell = canvas.closest('.task-canvas-shell');
+  if(!shell) return;
+  const bounds = shell.getBoundingClientRect();
+  const aspect = canvas.width / canvas.height;
+  const fittedWidth = Math.max(1, Math.min(bounds.width, bounds.height * aspect));
+  canvas.style.width = Math.floor(fittedWidth) + 'px';
+  canvas.style.height = Math.floor(fittedWidth / aspect) + 'px';
 }
 let taskCanvasResizeTimer;
 window.addEventListener('resize', ()=>{
