@@ -463,7 +463,31 @@ function showScreen(id){
   $(id).classList.add('active');
   if(id==='results') renderHistory();
   if(id==='leaderboard') renderLeaderboard();
+  if(id==='mot') fitTaskCanvas(motCanvas);
+  if(id==='vs') fitTaskCanvas(vsCanvas);
 }
+// shrinks a task canvas (keeping its aspect ratio) just enough that the
+// page fits the viewport without scrolling — the canvas's drawing
+// coordinate space (width/height attrs) stays fixed, only its CSS size changes
+function fitTaskCanvas(canvas){
+  if(!canvas) return;
+  canvas.style.width = '';
+  const overflow = document.documentElement.scrollHeight - window.innerHeight;
+  if(overflow > 0){
+    const rect = canvas.getBoundingClientRect();
+    const aspect = canvas.width / canvas.height;
+    const newHeight = Math.max(220, rect.height - overflow - 8);
+    canvas.style.width = (newHeight * aspect) + 'px';
+  }
+}
+let taskCanvasResizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(taskCanvasResizeTimer);
+  taskCanvasResizeTimer = setTimeout(()=>{
+    if($('mot').classList.contains('active')) fitTaskCanvas(motCanvas);
+    if($('vs').classList.contains('active')) fitTaskCanvas(vsCanvas);
+  }, 150);
+});
 function flash(kind){
   const el = $('flash');
   el.className = 'flash show ' + kind;
