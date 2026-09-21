@@ -214,6 +214,18 @@
   }
   .card h2{margin:0;font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;}
   .card p{margin:0;color:var(--text);font-weight:700;font-size:16px;line-height:1.5;}
+  .task-example{
+    background:#0e1317;border:1px solid var(--border);border-radius:6px;
+    padding:8px 10px;color:var(--accent);overflow:hidden;
+  }
+  .task-example svg{display:block;width:100%;height:92px;}
+  .task-example text{
+    font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.04em;
+    fill:var(--text-dim);
+  }
+  .task-example .example-label{fill:var(--accent);}
+  .task-example .example-muted{stroke:#778087;}
+  .task-example .example-target{stroke:var(--accent);}
   .card .meta{font-family:var(--mono);font-size:13px;color:var(--text-dim);display:flex;gap:14px;margin-top:4px;}
   .card .go{font-family:var(--mono);font-size:14px;color:var(--accent);margin-top:auto;letter-spacing:0.04em;}
   .card .go::after{content:' →';display:inline-block;transition:transform .18s;}
@@ -343,7 +355,18 @@
         <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
         <span class="tag">MODULE 01</span>
         <h2>VISUAL SEARCH</h2>
-        <p>You'll see a grid of T shapes. Most are rotated so they look uneven — only one is a straight, upright, symmetric T. Click that one, as fast as you can.</p>
+        <p>You'll see a grid of T shapes. Only one has its stem exactly in the center, making it symmetric. Click that one as fast as you can.</p>
+        <div class="task-example" aria-label="Visual Search example: choose the T whose stem is centered" role="img">
+          <svg viewBox="0 0 330 92" aria-hidden="true">
+            <text x="165" y="11" text-anchor="middle" class="example-label">CHOOSE THE SYMMETRIC T</text>
+            <g fill="none" stroke-width="6" stroke-linecap="round">
+              <g class="example-muted"><line x1="36" y1="34" x2="88" y2="34"/><line x1="46" y1="34" x2="46" y2="73"/></g>
+              <g class="example-target"><circle cx="165" cy="53" r="35" stroke-width="2" opacity=".5"/><line x1="139" y1="34" x2="191" y2="34"/><line x1="165" y1="34" x2="165" y2="73"/></g>
+              <g class="example-muted"><line x1="242" y1="34" x2="294" y2="34"/><line x1="283" y1="34" x2="283" y2="73"/></g>
+            </g>
+            <path d="M196 67l7 7 14-18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div class="meta"><span id="vsMetaTrials">16 TRIALS</span><span>configurable in Settings</span></div>
         <div class="go">RUN MODULE →</div>
       </div>
@@ -351,7 +374,30 @@
         <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
         <span class="tag">MODULE 02</span>
         <h2>OBJECT TRACKING</h2>
-        <p>A few dots will flash to show you the targets. Then all the dots start moving and look identical. Keep your eyes on the original targets until they stop.</p>
+        <p>A few dots will flash to show you the targets. Then all the dots move and look identical. Keep your eyes on the original targets; when they stop, click those same circles.</p>
+        <div class="task-example" aria-label="Object Tracking example: remember the highlighted circles, then select those same circles after they move" role="img">
+          <svg viewBox="0 0 330 92" aria-hidden="true">
+            <text x="67" y="11" text-anchor="middle" class="example-label">REMEMBER</text>
+            <text x="257" y="11" text-anchor="middle" class="example-label">SELECT THE SAME</text>
+            <g fill="#778087">
+              <circle cx="25" cy="37" r="7"/><circle cx="63" cy="60" r="7"/><circle cx="105" cy="32" r="7"/><circle cx="112" cy="72" r="7"/>
+            </g>
+            <g fill="currentColor" stroke="currentColor">
+              <circle cx="45" cy="70" r="9"/><circle cx="88" cy="45" r="9"/>
+            </g>
+            <path d="M137 51h38m-8-8 8 8-8 8" fill="none" stroke="#778087" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g fill="#778087">
+              <circle cx="214" cy="34" r="7"/><circle cx="244" cy="70" r="7"/><circle cx="282" cy="38" r="7"/><circle cx="306" cy="68" r="7"/>
+              <circle cx="222" cy="69" r="7"/><circle cx="274" cy="62" r="7"/>
+            </g>
+            <g fill="none" stroke="currentColor" stroke-width="3">
+              <circle cx="214" cy="34" r="12"/><circle cx="274" cy="62" r="12"/>
+            </g>
+            <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M207 33l5 5 9-11"/><path d="M267 61l5 5 9-11"/>
+            </g>
+          </svg>
+        </div>
         <div class="meta"><span id="motMetaTrials">5 TRIALS</span><span>configurable in Settings</span></div>
         <div class="go">RUN MODULE →</div>
       </div>
@@ -462,7 +508,7 @@
       <div class="task-canvas-shell">
         <canvas id="vsCanvas" width="1080" height="700"></canvas>
       </div>
-      <div class="stagenote" id="vsNote">Find the upright, symmetric T, then press the arrow key matching which way its stem points.</div>
+      <div class="stagenote" id="vsNote">Find the symmetric T, then press the arrow key matching which way its stem points.</div>
     </div>
   </section>
 
@@ -880,7 +926,7 @@ async function renderLeaderboard(tab){
 }
 
 /* =========================================================
-   VISUAL SEARCH — find the one mirror-symmetric (upright) glyph
+   VISUAL SEARCH — find the one mirror-symmetric glyph
    among glyphs with an off-center stem (which read as asymmetric),
    then report the target's stem direction with an arrow key.
    Rotation → direction the free end of the stem points:
