@@ -224,6 +224,7 @@
     fill:var(--text-dim);
   }
   .task-example .example-label{fill:var(--accent);}
+  .task-example .example-key{fill:var(--accent);font-size:22px;}
   .task-example .example-muted{stroke:#778087;}
   .task-example .example-target{stroke:var(--accent);}
   .card .meta{font-family:var(--mono);font-size:13px;color:var(--text-dim);display:flex;gap:14px;margin-top:4px;}
@@ -355,16 +356,17 @@
         <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
         <span class="tag">MODULE 01</span>
         <h2>VISUAL SEARCH</h2>
-        <p>You'll see a grid of T shapes. Only one has its stem exactly in the center, making it symmetric. Click that one as fast as you can.</p>
-        <div class="task-example" aria-label="Visual Search example: choose the T whose stem is centered" role="img">
+        <p>You'll see a grid of T shapes. Find the one with its stem exactly in the center, then press the keyboard arrow matching the direction its stem points.</p>
+        <div class="task-example" aria-label="Visual Search example: find the symmetric T, then press the keyboard arrow matching its stem direction" role="img">
           <svg viewBox="0 0 330 92" aria-hidden="true">
-            <text x="165" y="11" text-anchor="middle" class="example-label">CHOOSE THE SYMMETRIC T</text>
+            <text x="165" y="11" text-anchor="middle" class="example-label">FIND T, THEN PRESS MATCHING ARROW</text>
             <g fill="none" stroke-width="6" stroke-linecap="round">
               <g class="example-muted"><line x1="36" y1="34" x2="88" y2="34"/><line x1="46" y1="34" x2="46" y2="73"/></g>
               <g class="example-target"><circle cx="165" cy="53" r="35" stroke-width="2" opacity=".5"/><line x1="139" y1="34" x2="191" y2="34"/><line x1="165" y1="34" x2="165" y2="73"/></g>
               <g class="example-muted"><line x1="242" y1="34" x2="294" y2="34"/><line x1="283" y1="34" x2="283" y2="73"/></g>
             </g>
-            <path d="M196 67l7 7 14-18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="199" y="53" width="34" height="29" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+            <text x="216" y="75" text-anchor="middle" class="example-key">↓</text>
           </svg>
         </div>
         <div class="meta"><span id="vsMetaTrials">16 TRIALS</span><span>configurable in Settings</span></div>
