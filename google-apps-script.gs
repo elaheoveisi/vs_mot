@@ -8,7 +8,7 @@
 
 const SPREADSHEET_ID = 'PASTE_YOUR_SPREADSHEET_ID_HERE';
 const SHEET_NAME = 'Leaderboard';
-const MAX_ATTEMPTS_PER_MODULE = 3;
+const MAX_ATTEMPTS_PER_MODULE = 2;
 const NOTIFY_EMAILS = ['elahe.oveisi1992@gmail.com', 'elahe.oveisi@okstate.edu'];
 const HEADERS = [
   'email',

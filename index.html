@@ -77,6 +77,9 @@
   }
   .navbtn:hover,.navbtn:focus-visible{color:var(--text);border-color:var(--cyan);}
   .navbtn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+  /* admin-only nav — hidden from participants, revealed by visiting ?admin=1 once */
+  .navbtn.adminbtn{display:none;}
+  html.admin-mode .navbtn.adminbtn{display:inline-block;}
 
   /* iHuman Lab logo mark */
   .brand-logo{
@@ -327,9 +330,9 @@
     </div>
     <nav>
       <button class="navbtn" onclick="showScreen('menu')">INSTRUMENTS</button>
-      <button class="navbtn" onclick="openSettings()">SETTINGS</button>
-      <button class="navbtn" onclick="showScreen('results')">MY RESULTS</button>
-      <button class="navbtn" onclick="showScreen('leaderboard')">LEADERBOARD</button>
+      <button class="navbtn adminbtn" onclick="openSettings()">SETTINGS</button>
+      <button class="navbtn adminbtn" onclick="showScreen('results')">MY RESULTS</button>
+      <button class="navbtn adminbtn" onclick="showScreen('leaderboard')">LEADERBOARD</button>
     </nav>
   </header>
 
@@ -348,7 +351,7 @@
       </div>
       <div class="settingsnote warn" id="nameWarning" style="display:none;">Enter a valid email before running a module.</div>
       <div class="settingsnote" style="margin-top:10px;">
-        You can play each module up to <b style="color:var(--text);">3 times</b> if you weren't comfortable with an earlier attempt — after that, further runs won't be recorded. But you need to play both modules!!
+        You can play each module up to <b style="color:var(--text);">2 times</b> if you weren't comfortable with an earlier attempt — after that, further runs won't be recorded. But you need to play both modules!!
       </div>
     </div>
     <div class="grid2">
@@ -589,6 +592,21 @@
 <div class="flash" id="flash"></div>
 
 <script>
+/* ---------- admin mode ----------
+   Participants only ever see INSTRUMENTS. Visit once with ?admin=1 in the
+   URL (e.g. https://.../?admin=1) from a lab device to reveal Settings,
+   My Results and Leaderboard — that device then remembers admin mode. */
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('admin') === '1'){
+      localStorage.setItem('ihuman_admin', '1');
+    }
+    if(localStorage.getItem('ihuman_admin') === '1'){
+      document.documentElement.classList.add('admin-mode');
+    }
+  }catch(e){}
+})();
+
 /* ---------- utility ---------- */
 const $ = id => document.getElementById(id);
 function showScreen(id){
@@ -689,7 +707,7 @@ $('playerEmailInput').addEventListener('input', ()=>{
   currentEmail = $('playerEmailInput').value.trim().toLowerCase();
   try{ localStorage.setItem('ihuman_email', currentEmail); }catch(e){}
 });
-const MAX_ATTEMPTS_PER_MODULE = 3;
+const MAX_ATTEMPTS_PER_MODULE = 2;
 async function requireEmailThen(fn, game){
   currentEmail = $('playerEmailInput').value.trim().toLowerCase();
   if(!EMAIL_RE.test(currentEmail)){
