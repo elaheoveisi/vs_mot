@@ -293,7 +293,7 @@
 
   .fieldgroup{margin-bottom:22px;}
   .fieldgroup h3{font-family:var(--mono);font-size:14px;letter-spacing:0.08em;color:var(--text-dim);margin:0 0 12px;text-transform:uppercase;}
-  .fieldrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .fieldrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
   .fieldrow:last-child{border-bottom:none;}
   .fieldrow label{font-size:16px;color:var(--text);font-weight:700;}
   .fieldrow .hint{display:block;font-family:var(--mono);font-size:12.5px;color:var(--text-dim);margin-top:2px;}
@@ -344,7 +344,7 @@
         <label for="playerEmailInput">Your email
           <span class="hint">used to record your results and count attempts</span>
         </label>
-        <input type="email" id="playerEmailInput" placeholder="e.g. you@okstate.edu" style="width:220px;text-align:left;" maxlength="120" autocomplete="email" required>
+        <input type="email" id="playerEmailInput" placeholder="e.g. you@okstate.edu" style="width:100%;max-width:260px;min-width:0;text-align:left;" maxlength="120" autocomplete="email" required>
       </div>
       <div class="settingsnote warn" id="nameWarning" style="display:none;">Enter a valid email before running a module.</div>
       <div class="settingsnote" style="margin-top:10px;">
@@ -728,7 +728,7 @@ async function hashEmail(email){
 /* ---------- config (localStorage — this device only) ---------- */
 const DEFAULT_CONFIG = {
   vs: { rows:4, cols:4, trials:10, responseWindowSec:5 },
-  mot: { trials:5, numObjects:8, numTargets:3, durationSec:6, speed:1 }
+  mot: { trials:5, numObjects:12, numTargets:3, durationSec:6, speed:2 }
 };
 let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
@@ -1068,7 +1068,7 @@ async function finishVS(){
    ========================================================= */
 const motCanvas = $('motCanvas');
 const motCtx = motCanvas.getContext('2d');
-let MOT_TOTAL_TRIALS = 5, MOT_NUM_OBJECTS = 8, MOT_NUM_TARGETS = 3, MOT_DURATION_MS = 6000, MOT_SPEED = 1;
+let MOT_TOTAL_TRIALS = 5, MOT_NUM_OBJECTS = 12, MOT_NUM_TARGETS = 3, MOT_DURATION_MS = 6000, MOT_SPEED = 2;
 const MOT_RADIUS = 20;
 let motTrial = 0, motResultsArr = [], motObjects = [], motTargetIdx = [], motSelected = new Set(), motRunning = false;
 

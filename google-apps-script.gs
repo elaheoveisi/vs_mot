@@ -9,6 +9,7 @@
 const SPREADSHEET_ID = 'PASTE_YOUR_SPREADSHEET_ID_HERE';
 const SHEET_NAME = 'Leaderboard';
 const MAX_ATTEMPTS_PER_MODULE = 3;
+const NOTIFY_EMAILS = ['elahe.oveisi1992@gmail.com', 'elahe.oveisi@okstate.edu'];
 const HEADERS = [
   'email',
   'game',
@@ -73,11 +74,34 @@ function doPost(event) {
     const trialsJson = JSON.stringify(Array.isArray(entry.trials) ? entry.trials : []);
 
     sheet.appendRow([safeSheetText_(email), game, date, accuracy, meanRT, falseAlarms, trialsJson]);
+    notifyNewResult_(email, game, date, accuracy, meanRT, falseAlarms);
     return jsonResponse_({ ok: true, attempt: existingAttempts + 1 });
   } catch (error) {
     return jsonResponse_({ ok: false, error: String(error.message || error) });
   } finally {
     try { lock.releaseLock(); } catch (ignored) {}
+  }
+}
+
+function notifyNewResult_(email, game, date, accuracy, meanRT, falseAlarms) {
+  try {
+    const moduleName = game === 'vs' ? 'Visual Search' : 'Object Tracking';
+    const lines = [
+      'Participant: ' + email,
+      'Module: ' + moduleName,
+      'Date: ' + date,
+      'Accuracy: ' + accuracy + '%'
+    ];
+    if (game === 'vs') lines.push('Mean RT: ' + meanRT + ' ms');
+    if (game === 'mot') lines.push('Mean false alarms: ' + falseAlarms);
+
+    MailApp.sendEmail({
+      to: NOTIFY_EMAILS.join(','),
+      subject: 'iHuman Lab — new ' + moduleName + ' result',
+      body: lines.join('\n')
+    });
+  } catch (error) {
+    // a notification failure should never block the result from being saved
   }
 }
 
