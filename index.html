@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iHuman Lab — Visual Search &amp; Tracking Instruments</title>
+<title>iHuman Lab — Visual Search &amp; Tracking Modules</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -329,7 +329,7 @@
       </div>
     </div>
     <nav>
-      <button class="navbtn" onclick="showScreen('menu')">INSTRUMENTS</button>
+      <button class="navbtn" onclick="showScreen('menu')">MODULES</button>
       <button class="navbtn adminbtn" onclick="openSettings()">SETTINGS</button>
       <button class="navbtn adminbtn" onclick="showScreen('results')">MY RESULTS</button>
       <button class="navbtn adminbtn" onclick="showScreen('leaderboard')">LEADERBOARD</button>
@@ -427,7 +427,7 @@
   <!-- SETTINGS -->
   <section id="settings" class="screen">
     <div class="panel instrument"><span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
-      <h2 style="font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;color:var(--cyan);margin-top:0;">INSTRUMENT SETTINGS</h2>
+      <h2 style="font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;color:var(--cyan);margin-top:0;">MODULE SETTINGS</h2>
       <div class="settingsnote" style="font-size:14px;color:var(--pink);margin-bottom:16px;">
         ⚠ Changing these affects everyone's results going forward — please leave them as-is unless you're intentionally reconfiguring the study.
       </div>
@@ -528,7 +528,7 @@
       <table id="vsBreakdown"><thead><tr><th>Trial</th><th>Result</th><th>RT</th></tr></thead><tbody></tbody></table>
       <div class="respbar" style="margin-top:22px;">
         <button class="primary" onclick="startVS()">RUN AGAIN</button>
-        <button class="ghost" onclick="showScreen('menu')">BACK TO INSTRUMENTS</button>
+        <button class="ghost" onclick="showScreen('menu')">BACK TO MODULES</button>
       </div>
     </div>
   </section>
@@ -562,7 +562,7 @@
       <table id="motBreakdown"><thead><tr><th>Trial</th><th>Targets</th><th>Correct</th><th>False alarms</th></tr></thead><tbody></tbody></table>
       <div class="respbar" style="margin-top:22px;">
         <button class="primary" onclick="startMOT()">RUN AGAIN</button>
-        <button class="ghost" onclick="showScreen('menu')">BACK TO INSTRUMENTS</button>
+        <button class="ghost" onclick="showScreen('menu')">BACK TO MODULES</button>
       </div>
     </div>
   </section>
@@ -583,7 +583,7 @@
       <img src="assets/osu-primary-logo.png" alt="Oklahoma State University" style="height:30px;width:auto;">
     </div>
     <p class="foot">
-      i<span style="color:var(--cyan);">Human</span> Lab — instruments for visual search &amp; multiple object tracking research
+      i<span style="color:var(--cyan);">Human</span> Lab — modules for visual search &amp; multiple object tracking research
       <br>Oklahoma State University · Human Factors Lab
     </p>
   </footer>
@@ -593,7 +593,7 @@
 
 <script>
 /* ---------- admin mode ----------
-   Participants only ever see INSTRUMENTS. Visit once with ?admin=1 in the
+   Participants only ever see MODULES. Visit once with ?admin=1 in the
    URL (e.g. https://.../?admin=1) from a lab device to reveal Settings,
    My Results and Leaderboard — that device then remembers admin mode. */
 (function(){
@@ -888,7 +888,7 @@ async function renderHistory(){
   body.innerHTML = '<div class="empty">Loading…</div>';
 
   if(!EMAIL_RE.test(currentEmail)){
-    body.innerHTML = '<div class="empty">Enter your email on Instruments to see your results.</div>';
+    body.innerHTML = '<div class="empty">Enter your email on Modules to see your results.</div>';
     return;
   }
 
@@ -903,7 +903,7 @@ async function renderHistory(){
   }
 
   if(!hist.length){
-    body.innerHTML = '<div class="empty">No sessions yet — run a module from Instruments.</div>';
+    body.innerHTML = '<div class="empty">No sessions yet — run a module from Modules.</div>';
     return;
   }
   let rows = hist.slice().reverse().map(h=>{
